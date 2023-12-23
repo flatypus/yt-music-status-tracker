@@ -11,6 +11,12 @@ import time
 load_dotenv()
 
 brand = os.getenv("BRAND")
+oauth = os.getenv("OAUTH")
+
+if oauth is not None:
+    with open("oauth.json", "w") as f:
+        f.write(oauth)
+
 ytmusic = YTMusic("oauth.json", brand)
 
 listening_to = None
