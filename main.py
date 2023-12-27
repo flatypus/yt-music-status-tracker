@@ -21,10 +21,14 @@ ytmusic = YTMusic("oauth.json", brand)
 
 listening_to = None
 
+
 async def run_background():
     global listening_to
     while True:
-        history = ytmusic.get_history()
+        try:
+            history = ytmusic.get_history()
+        except:
+            continue
         song = history[0]
         if listening_to is None or listening_to["title"] != song["title"]:
             listening_to = {
@@ -65,13 +69,12 @@ async def live():
             yield f"data: {json.dumps(listening_to)}\n\n"
             await asyncio.sleep(5)
 
-    return StreamingResponse(streamer_live())   
+    return StreamingResponse(streamer_live())
 
 
 @app.get("/last")
 async def last():
     return json.dumps(listening_to)
-
 
 
 @app.on_event('startup')
