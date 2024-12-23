@@ -1,8 +1,10 @@
+from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from ytmusicapi import YTMusic
+from ytmusicapi.auth.oauth import OAuthCredentials
 import asyncio
 import json
 import os
@@ -10,25 +12,31 @@ import time
 
 load_dotenv()
 
-brand = os.getenv("BRAND")
-oauth = os.getenv("OAUTH")
+BRAND = os.getenv("BRAND")
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+PORT = os.getenv("PORT") or 6969
 
-if oauth is not None:
-    with open("oauth.json", "w") as f:
-        f.write(oauth)
+if CLIENT_ID is None or CLIENT_SECRET is None:
+    raise Exception("CLIENT_ID and CLIENT_SECRET must be provided")
 
-ytmusic = YTMusic("oauth.json", brand)
+oauth_credentials=OAuthCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
+ytmusic = YTMusic("oauth.json", BRAND, oauth_credentials=oauth_credentials)
 
 listening_to = None
-
 
 async def run_background():
     global listening_to
     while True:
+        print("hi")
+        await asyncio.sleep(5)
         try:
             history = ytmusic.get_history()
-        except:
+            print(history)
+        except Exception as e:
+            print(e)
             continue
+        
         song = history[0]
         if listening_to is None or listening_to["title"] != song["title"]:
             listening_to = {
@@ -39,13 +47,15 @@ async def run_background():
                 "started": time.time(),
                 "url": f"https://music.youtube.com/watch?v={song['videoId']}"
             }
-        await asyncio.sleep(5)
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    asyncio.create_task(run_background())
+    yield
+        
+app = FastAPI(lifespan=lifespan)
 
-origins = [
-    "*"
-]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -54,7 +64,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 @app.get("/")
 def root():
@@ -77,6 +86,6 @@ async def last():
     return json.dumps(listening_to)
 
 
-@app.on_event('startup')
-async def app_startup():
-    asyncio.create_task(run_background())
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=6969)
