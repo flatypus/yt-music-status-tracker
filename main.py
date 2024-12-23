@@ -21,7 +21,7 @@ if CLIENT_ID is None or CLIENT_SECRET is None:
     raise Exception("CLIENT_ID and CLIENT_SECRET must be provided")
 
 oauth_credentials=OAuthCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
-ytmusic = YTMusic("oauth.json", BRAND, oauth_credentials=oauth_credentials)
+ytmusic = YTMusic("browser.json", BRAND, oauth_credentials=oauth_credentials)
 
 listening_to = None
 

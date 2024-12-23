@@ -20,5 +20,4 @@ print("CLIENT_SECRET:", CLIENT_SECRET)
 oauth_credentials=OAuthCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
 ytmusic = YTMusic("oauth.json", oauth_credentials=oauth_credentials)
 
-# history = ytmusic.get_history()
-# print(history)
+history = ytmusic.get_history()
