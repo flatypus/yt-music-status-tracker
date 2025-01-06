@@ -28,7 +28,6 @@ listening_to = None
 async def run_background():
     global listening_to
     while True:
-        print("hi")
         await asyncio.sleep(5)
         try:
             history = ytmusic.get_history()
@@ -88,4 +87,4 @@ async def last():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=6969)
+    uvicorn.run(app, host="0.0.0.0", port=6969, limit_max_requests=100)
