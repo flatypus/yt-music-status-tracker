@@ -38,9 +38,8 @@ async def run_background():
         await asyncio.sleep(5)
         try:
             history = ytmusic.get_history()
-            print(history)
         except Exception as e:
-            print(e)
+            print("Error:", e)
             continue
         
         song = history[0]
