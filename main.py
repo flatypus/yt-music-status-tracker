@@ -57,7 +57,7 @@ async def update_history():
             "artist": song["artists"][0]["name"],
             "thumbnail": song["thumbnails"][0]["url"],
             "duration_s": song["duration_seconds"],
-            "started": current_time,
+            "started": current_time + RELOAD_TIME / 2 + 1,
             "url": f"https://music.youtube.com/watch?v={song['videoId']}"
         }
     elif listening_to and listening_to["started"] + listening_to["duration_s"] < current_time:
