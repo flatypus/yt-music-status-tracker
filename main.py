@@ -42,8 +42,8 @@ async def update_history():
     
     try:
         history = ytmusic.get_history()
-        last_song = ytmusic.get_playlist(playlistId="FEmusic_history", limit=1)
-        print("Last song:", last_song)
+        # last_song = ytmusic.get_playlist(playlistId="FEmusic_history", limit=1)
+        # print("Last song:", last_song)
     except Exception as e:
         print("Error:", e)
         return
