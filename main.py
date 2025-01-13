@@ -29,11 +29,12 @@ oauth_credentials=OAuthCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SEC
 ytmusic = YTMusic("oauth.json", BRAND, oauth_credentials=oauth_credentials)
 
 listening_to = None
+last_song_name = None
 last_update = time.time()
 connections = []
 
 async def update_history():
-    global listening_to, last_update
+    global listening_to, last_update, last_song_name
     
     current_time = time.time()
     if current_time - last_update < RELOAD_TIME: 
@@ -42,22 +43,24 @@ async def update_history():
     
     try:
         history = ytmusic.get_history()
-        # last_song = ytmusic.get_playlist(playlistId="FEmusic_history", limit=1)
-        # print("Last song:", last_song)
     except Exception as e:
         print("Error:", e)
         return
     
-    song = history[0]
-    if listening_to is None or listening_to["title"] != song["title"]:
+    song = history[0] # TODO: figure out a cheaper way to get the most recent song listened to
+    
+    if listening_to is None or last_song_name != song["title"]:
+        last_song_name = song["title"]
         listening_to = {
             "title": song["title"],
             "artist": song["artists"][0]["name"],
             "thumbnail": song["thumbnails"][0]["url"],
             "duration_s": song["duration_seconds"],
-            "started": time.time(),
+            "started": current_time,
             "url": f"https://music.youtube.com/watch?v={song['videoId']}"
         }
+    elif listening_to and listening_to["started"] + listening_to["duration_s"] < current_time:
+        listening_to = None
         
 app = FastAPI()
 
