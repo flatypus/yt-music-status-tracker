@@ -49,7 +49,7 @@ async def update_history():
     
     song = history[0] # TODO: figure out a cheaper way to get the most recent song listened to
     print(listening_to)
-    if listening_to is None or last_song_name != song["title"]:
+    if last_song_name != song["title"]:
         last_song_name = song["title"]
         listening_to = {
             "title": song["title"],
