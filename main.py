@@ -80,10 +80,10 @@ async def live():
     async def streamer_live():
         while True:
             await update_history()
-            yield f"data: {json.dumps(listening_to)}\n\n"
+            yield f"data: {json.dumps(listening_to, default=str)}\n\n"
             await asyncio.sleep(RELOAD_TIME)
 
-    return StreamingResponse(streamer_live())
+    return StreamingResponse(streamer_live(), media_type="text/event-stream")
 
 @app.get("/last")
 async def last():
