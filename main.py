@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -48,7 +49,7 @@ async def update_history():
         return
     
     song = history[0] # TODO: figure out a cheaper way to get the most recent song listened to
-    print(listening_to)
+
     if last_song_name != song["title"]:
         last_song_name = song["title"]
         listening_to = {
@@ -59,12 +60,21 @@ async def update_history():
             "started": current_time,
             "url": f"https://music.youtube.com/watch?v={song['videoId']}"
         }
-        print("New song:", listening_to)   
     elif listening_to and listening_to["started"] + listening_to["duration_s"] < current_time:
-        print("Song ended")
         listening_to = None
         
-app = FastAPI()
+        
+async def run_background():
+    while True:
+        await update_history()
+        await asyncio.sleep(RELOAD_TIME)
+        
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    asyncio.create_task(run_background())
+    yield
+        
+app = FastAPI(lifespan=lifespan)
 
 origins = ["*"]
 
@@ -84,7 +94,6 @@ def root():
 async def live():
     async def streamer_live():
         while True:
-            await update_history()
             yield f"data: {json.dumps(listening_to, default=str)}\n\n"
             await asyncio.sleep(RELOAD_TIME)
 
