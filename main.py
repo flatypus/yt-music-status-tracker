@@ -38,6 +38,8 @@ async def run_background():
         await asyncio.sleep(5)
         try:
             history = ytmusic.get_history()
+            last_song = ytmusic.get_playlist(playlistId="FEmusic_history", limit=1)
+            print("Last song:", last_song)
         except Exception as e:
             print("Error:", e)
             continue
