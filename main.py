@@ -48,7 +48,7 @@ async def update_history():
         return
     
     song = history[0] # TODO: figure out a cheaper way to get the most recent song listened to
-    
+    print(listening_to)
     if listening_to is None or last_song_name != song["title"]:
         last_song_name = song["title"]
         listening_to = {
@@ -59,7 +59,9 @@ async def update_history():
             "started": current_time,
             "url": f"https://music.youtube.com/watch?v={song['videoId']}"
         }
+        print("New song:", listening_to)   
     elif listening_to and listening_to["started"] + listening_to["duration_s"] < current_time:
+        print("Song ended")
         listening_to = None
         
 app = FastAPI()
