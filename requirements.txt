@@ -1,5 +1,0 @@
-fastapi==0.105.0
-gunicorn
-python-dotenv==1.0.0
-uvicorn[standard]==0.25.0
-ytmusicapi==1.9.1
